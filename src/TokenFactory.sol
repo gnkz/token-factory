@@ -1,18 +1,22 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.27;
+pragma solidity ^0.8.4;
 
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-import {ERC20TokenUpgradeable} from "./ERC20TokenUpgradeable.sol";
 
-contract ERC20Factory {
+import {ERC20TokenUpgradeable} from "./ERC20TokenUpgradeable.sol";
+import {ERC20TokenUpgradeableProxy} from "./ERC20TokenUpgradeableProxy.sol";
+
+contract TokenFactory {
     event Deployment(address indexed deployer, uint256 indexed nonce, address indexed tokenAddress);
 
-    address public immutable implementation;
+    address public immutable proxyImplementation;
+    address public immutable tokenImplementation;
 
     mapping(address => uint256) internal _nonces;
 
-    constructor(address _implementation) {
-        implementation = _implementation;
+    constructor(address _proxyImplementation, address _tokenImplementation) {
+        proxyImplementation = _proxyImplementation;
+        tokenImplementation = _tokenImplementation;
     }
 
     function deploy(
@@ -26,15 +30,16 @@ contract ERC20Factory {
 
         _nonces[msg.sender]++;
 
-        ERC20TokenUpgradeable token = ERC20TokenUpgradeable(
-            Clones.cloneDeterministic(implementation, keccak256(abi.encode(msg.sender, currentNonce)))
-        );
+        bytes32 salt = _salt(msg.sender, currentNonce);
 
-        token.initialize(_name, _symbol, _initialSupply, _supplyOwner, _owner);
+        ERC20TokenUpgradeableProxy proxy =
+            ERC20TokenUpgradeableProxy(payable(Clones.cloneDeterministic(proxyImplementation, salt)));
 
-        emit Deployment(msg.sender, currentNonce, address(token));
+        proxy.initialize(tokenImplementation, _name, _symbol, _initialSupply, _supplyOwner, _owner);
 
-        return address(token);
+        emit Deployment(msg.sender, currentNonce, address(proxy));
+
+        return address(proxy);
     }
 
     function nonce(address _addr) external view returns (uint256) {
@@ -42,11 +47,11 @@ contract ERC20Factory {
     }
 
     function predictTokenAddress(address _addr, uint256 _nonce) public view returns (address) {
-        return Clones.predictDeterministicAddress(implementation, _salt(_addr, _nonce), address(this));
+        return Clones.predictDeterministicAddress(proxyImplementation, _salt(_addr, _nonce), address(this));
     }
 
     function predictNextTokenAddress(address _addr) public view returns (address) {
-        return Clones.predictDeterministicAddress(implementation, _salt(_addr, _nonces[_addr]), address(this));
+        return Clones.predictDeterministicAddress(proxyImplementation, _salt(_addr, _nonces[_addr]), address(this));
     }
 
     function _salt(address _sender, uint256 _nonce) internal pure returns (bytes32) {
