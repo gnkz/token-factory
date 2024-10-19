@@ -11,7 +11,7 @@ contract TokensScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        new ERC20Token("Dummy USD", "dUSD", 1_000_000_000_000 ether, msg.sender);
+        new ERC20Token("Dummy USD", "dUSD", 1_000_000_000_000 ether, msg.sender, msg.sender);
         new WrappedNativeToken("Wrapped ETH", "wETH");
 
         vm.stopBroadcast();
