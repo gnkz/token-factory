@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.27;
+pragma solidity ^0.8.4;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {ERC20PermitUpgradeable} from
@@ -17,7 +17,7 @@ contract ERC20TokenUpgradeable is UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         uint256 _initialSupply,
         address _supplyReceiver,
         address _owner
-    ) external initializer {
+    ) external onlyInitializing {
         __UUPSUpgradeable_init();
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
