@@ -19,7 +19,7 @@ contract TokenFactory {
         tokenImplementation = _tokenImplementation;
     }
 
-    function deploy(
+    function deployERC20Upgradeable(
         string memory _name,
         string memory _symbol,
         uint256 _initialSupply,
