@@ -31,7 +31,7 @@ contract TokenFactoryTest is Test {
         uint256 initialSupply = 1_000_000 ether;
 
         ERC20TokenUpgradeable token =
-            ERC20TokenUpgradeable(factory.deploy(tokenName, tokenSymbol, initialSupply, owner, owner));
+            ERC20TokenUpgradeable(factory.deployERC20Upgradeable(tokenName, tokenSymbol, initialSupply, owner, owner));
 
         vm.assertEq(token.name(), tokenName);
         vm.assertEq(token.symbol(), tokenSymbol);
@@ -45,7 +45,7 @@ contract TokenFactoryTest is Test {
         string memory tokenSymbol = "uToken";
         uint256 initialSupply = 1_000_000 ether;
 
-        address tokenProxy = factory.deploy(tokenName, tokenSymbol, initialSupply, owner, owner);
+        address tokenProxy = factory.deployERC20Upgradeable(tokenName, tokenSymbol, initialSupply, owner, owner);
 
         vm.expectRevert(Initializable.InvalidInitialization.selector);
         ERC20TokenUpgradeableProxy(payable(tokenProxy)).initialize(
@@ -62,7 +62,7 @@ contract TokenFactoryTest is Test {
         uint256 initialSupply = 1_000_000 ether;
 
         ERC20TokenUpgradeable token =
-            ERC20TokenUpgradeable(factory.deploy(tokenName, tokenSymbol, initialSupply, owner, owner));
+            ERC20TokenUpgradeable(factory.deployERC20Upgradeable(tokenName, tokenSymbol, initialSupply, owner, owner));
 
         vm.expectRevert(Initializable.NotInitializing.selector);
         token.initialize(tokenName, tokenSymbol, initialSupply, owner, owner);
@@ -74,7 +74,7 @@ contract TokenFactoryTest is Test {
         uint256 initialSupply = 1_000_000 ether;
 
         ERC20TokenUpgradeable tokenProxy =
-            ERC20TokenUpgradeable(factory.deploy(tokenName, tokenSymbol, initialSupply, owner, owner));
+            ERC20TokenUpgradeable(factory.deployERC20Upgradeable(tokenName, tokenSymbol, initialSupply, owner, owner));
 
         ERC20TokenUpgradeable newToken = new ERC20TokenUpgradeable();
 
@@ -90,13 +90,14 @@ contract TokenFactoryTest is Test {
         address predictedTokenAddress = factory.predictNextTokenAddress(address(this));
 
         ERC20TokenUpgradeable token =
-            ERC20TokenUpgradeable(factory.deploy(tokenName, tokenSymbol, initialSupply, owner, owner));
+            ERC20TokenUpgradeable(factory.deployERC20Upgradeable(tokenName, tokenSymbol, initialSupply, owner, owner));
 
         vm.assertEq(address(token), predictedTokenAddress);
 
         predictedTokenAddress = factory.predictNextTokenAddress(address(this));
 
-        token = ERC20TokenUpgradeable(factory.deploy(tokenName, tokenSymbol, initialSupply, owner, owner));
+        token =
+            ERC20TokenUpgradeable(factory.deployERC20Upgradeable(tokenName, tokenSymbol, initialSupply, owner, owner));
 
         vm.assertEq(address(token), predictedTokenAddress);
     }
@@ -111,7 +112,7 @@ contract TokenFactoryTest is Test {
         address predictedTokenAddress = factory.predictNextTokenAddress(address(this));
 
         ERC20TokenUpgradeable token =
-            ERC20TokenUpgradeable(factory.deploy(tokenName, tokenSymbol, initialSupply, owner, owner));
+            ERC20TokenUpgradeable(factory.deployERC20Upgradeable(tokenName, tokenSymbol, initialSupply, owner, owner));
 
         vm.assertEq(address(token), predictedTokenAddress);
         vm.assertEq(factory.nonce(address(this)), initialNonce + 1);
