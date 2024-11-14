@@ -22,22 +22,14 @@
       in
       {
 
-        devShell =
+        devShells.default =
           with pkgs;
           mkShell {
             buildInputs = [
-              # From the foundry overlay
-              # Note: Can also be referenced without overlaying as: foundry.defaultPackage.${system}
               foundry-bin
-
-              # ... any other dependencies we need
               solc
+              pnpm
             ];
-
-            # Decorative prompt override so we know when we're in a dev shell
-            shellHook = ''
-              export PS1="[dev] $PS1"
-            '';
           };
       }
     );
