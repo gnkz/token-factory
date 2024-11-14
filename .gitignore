@@ -2,10 +2,8 @@
 cache/
 out/
 
-# Ignores development broadcast logs
-!/broadcast
-/broadcast/*/31337/
-/broadcast/**/dry-run/
+# Ignores broadcasts
+broadcast/
 
 # Docs
 docs/
@@ -13,4 +11,8 @@ docs/
 # Dotenv file
 .env
 
+# Direnv
 .direnv
+
+# Node modules
+node_modules/

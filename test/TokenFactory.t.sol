@@ -3,11 +3,12 @@ pragma solidity ^0.8.4;
 
 import {Test} from "forge-std/Test.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import {Brick} from "../src/Brick.sol";
 import {TokenFactory} from "../src/TokenFactory.sol";
 import {ERC20TokenUpgradeable} from "../src/ERC20TokenUpgradeable.sol";
 import {ERC20TokenUpgradeableProxy} from "../src/ERC20TokenUpgradeableProxy.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract TokenFactoryTest is Test {
     TokenFactory factory;
@@ -38,6 +39,19 @@ contract TokenFactoryTest is Test {
         vm.assertEq(token.totalSupply(), initialSupply);
         vm.assertEq(token.balanceOf(owner), initialSupply);
         vm.assertEq(token.owner(), owner);
+    }
+
+    function testDeployedTokenCanBeUpgraded() public {
+        string memory tokenName = "Upgradeable Token";
+        string memory tokenSymbol = "uToken";
+        uint256 initialSupply = 1_000_000 ether;
+
+        ERC20TokenUpgradeable token =
+            ERC20TokenUpgradeable(factory.deployERC20Upgradeable(tokenName, tokenSymbol, initialSupply, owner, owner));
+
+        vm.startPrank(owner);
+        token.upgradeToAndCall(address(new Brick()), "");
+        vm.stopPrank();
     }
 
     function testDeployedProxyCannotBeInitializedAgain() public {
