@@ -13,4 +13,8 @@ docs/
 # Dotenv file
 .env
 
+# Direnv
 .direnv
+
+# Node modules
+node_modules/
